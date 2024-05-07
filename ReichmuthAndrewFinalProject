@@ -1,0 +1,374 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+class SandwichBuilderApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Andrew's Sandwiches")
+        self.geometry("800x600")
+
+        # Restaurant logo
+        self.logo = tk.PhotoImage(file="restaurant_logo.png")
+        self.logo_label = tk.Label(self, image=self.logo)
+        self.logo_label.pack(pady=20)
+
+        # Sandwich image
+        self.sandwich_image = tk.PhotoImage(file="sandwich.png")
+        self.sandwich_label = tk.Label(self, image=self.sandwich_image)
+        self.sandwich_label.pack(pady=20)
+
+        # Order button
+        self.order_button = tk.Button(self, text="Please press here to place an order.", command=self.open_order_page)
+        self.order_button.pack(pady=20)
+
+        
+        # Exit button
+        self.exit_button = tk.Button(self, text="Exit", command=self.close_window)
+        self.exit_button.pack(pady=10)
+
+
+    def open_order_page(self):
+        self.order_page = OrderPage(self)
+        self.order_page.mainloop()
+
+    def close_window(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.destroy()
+
+class OrderPage(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Order Your Sandwich")
+        self.geometry("800x800")
+
+        self.parent = parent  # Keep a reference to the parent window
+
+        # Bread selection
+        self.bread_label = tk.Label(self, text="Click here to select your bread:")
+        self.bread_label.pack(pady=10)
+        self.bread_button = tk.Button(self, text="Open Menu", command=self.open_bread_menu)
+        self.bread_button.pack(pady=10)
+
+        # Toasting selection
+        self.toasting_label = tk.Label(self, text="Click here to select whether you would like your sandwich toasted:")
+        self.toasting_label.pack(pady=10)
+        self.toasting_button = tk.Button(self, text="Open Menu", command=self.open_toasting_menu)
+        self.toasting_button.pack(pady=10)
+
+        # Main ingredient selection
+        self.main_label = tk.Label(self, text="Click here to select your main:")
+        self.main_label.pack(pady=10)
+        self.main_button = tk.Button(self, text="Open Menu", command=self.open_main_menu)
+        self.main_button.pack(pady=10)
+
+        # Cheese selection
+        self.cheese_label = tk.Label(self, text="Select your Cheese")
+        self.cheese_label.pack(pady=10)
+        self.cheese_button = tk.Button(self, text="Open Menu", command=self.open_cheese_menu)
+        self.cheese_button.pack(pady=10)
+
+        # Sauce selection
+        self.sauce_label = tk.Label(self, text="Select Your Sauce")
+        self.sauce_label.pack(pady=10)
+        self.sauce_button = tk.Button(self, text="Open Menu", command=self.open_sauce_menu)
+        self.sauce_button.pack(pady=10)
+
+        # Side selection
+        self.side_label = tk.Label(self, text="Select Your Side")
+        self.side_label.pack(pady=10)
+        self.side_button = tk.Button(self, text="Open Menu", command=self.open_side_menu)
+        self.side_button.pack(pady=10)
+
+        # Drink selection
+        self.drink_label = tk.Label(self, text="Select your drink")
+        self.drink_label.pack(pady=10)
+        self.drink_button = tk.Button(self, text="Open Menu", command=self.open_drink_menu)
+        self.drink_button.pack(pady=10)
+
+        # Order button
+        self.order_button = tk.Button(self, text="Click here to place your order", command=self.place_order)
+        self.order_button.pack(pady=20)
+
+        # Back button
+        self.back_button = tk.Button(self, text="Back", command=self.close_window)
+        self.back_button.pack(pady=20)
+
+    def open_bread_menu(self):
+        self.bread_menu = BreadMenu(self)
+        self.bread_menu.mainloop()
+
+    def open_toasting_menu(self):
+        self.toasting_menu = ToastingMenu(self)
+        self.toasting_menu.mainloop()
+
+    def open_main_menu(self):
+        self.main_menu = MainMenu(self)
+        self.main_menu.mainloop()
+
+    def open_cheese_menu(self):
+        self.cheese_menu = CheeseMenu(self)
+        self.cheese_menu.mainloop()
+
+    def open_sauce_menu(self):
+        self.sauce_menu = SauceMenu(self)
+        self.sauce_menu.mainloop()
+
+    def open_side_menu(self):
+        self.side_menu = SideMenu(self)
+        self.side_menu.mainloop()
+
+    def open_drink_menu(self):
+        self.drink_menu = DrinkMenu(self)
+        self.drink_menu.mainloop()
+
+    def place_order(self):
+        # Checking if all selections are made
+        if self.bread_menu.bread_var.get() and self.toasting_menu.toasting_var.get() and self.main_menu.main_var.get() \
+            and self.cheese_menu.cheese_var.get() and self.sauce_menu.sauce_var.get() and self.side_menu.side_var.get() \
+                and self.drink_menu.drink_var.get():
+            order_summary = (
+                f"Bread: {self.bread_menu.bread_var.get()}\n"
+                f"Toasted: {self.toasting_menu.toasting_var.get()}\n"
+                f"Main: {self.main_menu.main_var.get()}\n"
+                f"Cheese: {self.cheese_menu.cheese_var.get()}\n"
+                f"Sauce: {self.sauce_menu.sauce_var.get()}\n"
+                f"Side: {self.side_menu.side_var.get()}\n"
+                f"Drink: {self.drink_menu.drink_var.get()}"
+            )
+            messagebox.showinfo("Order Summary", order_summary + "\n\nPlease proceed to pick up your order in 15 minutes.")
+            # Close the application after displaying order summary
+            self.parent.close_window()
+        else:
+            messagebox.showwarning("Incomplete Order", "Please make sure all selections are made.")
+
+    def close_window(self):
+        self.destroy()
+
+class BreadMenu(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Select Your Bread")
+        self.geometry("400x300")
+
+        self.parent = parent  # Keep a reference to the parent window
+
+        self.bread_options = ["white", "wheat", "sourdough", "rye", "raisin"]
+        self.bread_var = tk.StringVar()
+        self.bread_var.set("")
+
+        self.bread_dropdown = ttk.Combobox(self, textvariable=self.bread_var, values=self.bread_options)
+        self.bread_dropdown.pack(pady=20)
+
+        self.select_button = tk.Button(self, text="Select", command=self.select_bread)
+        self.select_button.pack(pady=20)
+
+        # Back button
+        self.back_button = tk.Button(self, text="Back", command=self.close_window)
+        self.back_button.pack(pady=20)
+
+    def select_bread(self):
+        if self.bread_var.get():
+            print(f"Bread selected: {self.bread_var.get()}")
+            self.destroy()
+        else:
+            messagebox.showwarning("Incomplete Selection", "Please select a bread option.")
+
+    def close_window(self):
+        self.destroy()
+
+class ToastingMenu(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Select Toasting Option")
+        self.geometry("400x300")
+
+        self.parent = parent  # Keep a reference to the parent window
+
+        self.toasting_options = ["Toasted", "Untoasted"]
+        self.toasting_var = tk.StringVar()
+        self.toasting_var.set("")
+
+        self.toasting_dropdown = ttk.Combobox(self, textvariable=self.toasting_var, values=self.toasting_options)
+        self.toasting_dropdown.pack(pady=20)
+
+        self.select_button = tk.Button(self, text="Select", command=self.select_toasting_level)
+        self.select_button.pack(pady=20)
+
+        # Back button
+        self.back_button = tk.Button(self, text="Back", command=self.close_window)
+        self.back_button.pack(pady=20)
+
+    def select_toasting_level(self):
+        if self.toasting_var.get():
+            print(f"Toasting option selected: {self.toasting_var.get()}")
+            self.destroy()
+        else:
+            messagebox.showwarning("Incomplete Selection", "Please select a toasting option.")
+
+    def close_window(self):
+        self.destroy()
+
+class MainMenu(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Select Main Course")
+        self.geometry("400x300")
+
+        self.parent = parent  # Keep a reference to the parent window
+
+        self.main_options = ["Turkey", "Roast Beef", "Tuna Salad", "Ham", "Bacon", "Burger patty", "Black Bean Burger patty",
+                             "Portobello Mushroom", "Faux Chicken Cutlet", "Chicken Cutlet"]
+        self.main_var = tk.StringVar()
+        self.main_var.set("")
+
+        self.main_dropdown = ttk.Combobox(self, textvariable=self.main_var, values=self.main_options)
+        self.main_dropdown.pack(pady=20)
+
+        self.select_button = tk.Button(self, text="Select", command=self.select_main_course)
+        self.select_button.pack(pady=20)
+
+        # Back button
+        self.back_button = tk.Button(self, text="Back", command=self.close_window)
+        self.back_button.pack(pady=20)
+
+    def select_main_course(self):
+        if self.main_var.get():
+            print(f"Main course selected: {self.main_var.get()}")
+            self.destroy()
+        else:
+            messagebox.showwarning("Incomplete Selection", "Please select a main course.")
+
+    def close_window(self):
+        self.destroy()
+
+class CheeseMenu(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Select Cheese:")
+        self.geometry("400x300")
+
+        self.parent = parent  # Keep a reference to the parent window
+
+        self.cheese_options = ["American", "Mozzarella", "Pepperjack", "Cheddar", "Vegan Cheddar Shreds", "None"]
+        self.cheese_var = tk.StringVar()
+        self.cheese_var.set("")
+
+        self.cheese_dropdown = ttk.Combobox(self, textvariable=self.cheese_var, values=self.cheese_options)
+        self.cheese_dropdown.pack(pady=20)
+
+        self.select_button = tk.Button(self, text="Select", command=self.select_cheese)
+        self.select_button.pack(pady=20)
+
+        # Back button
+        self.back_button = tk.Button(self, text="Back", command=self.close_window)
+        self.back_button.pack(pady=20)
+
+    def select_cheese(self):
+        if self.cheese_var.get():
+            print(f"Cheese selected: {self.cheese_var.get()}")
+            self.destroy()
+        else:
+            messagebox.showwarning("Incomplete Selection", "Please select a cheese option.")
+
+    def close_window(self):
+        self.destroy()
+
+class SauceMenu(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Select Sauce:")
+        self.geometry("400x300")
+
+        self.parent = parent  # Keep a reference to the parent window
+
+        self.sauce_options = ["Mayonnaise", "Mustard", "Honey Mustard", "Sriracha", "Ketchup", "Salsa", "Pesto","None"]
+        self.sauce_var = tk.StringVar()
+        self.sauce_var.set("")
+
+        self.sauce_dropdown = ttk.Combobox(self, textvariable=self.sauce_var, values=self.sauce_options)
+        self.sauce_dropdown.pack(pady=20)
+
+        self.select_button = tk.Button(self, text="Select", command=self.select_sauce)
+        self.select_button.pack(pady=20)
+
+        # Back button
+        self.back_button = tk.Button(self, text="Back", command=self.close_window)
+        self.back_button.pack(pady=20)
+
+    def select_sauce(self):
+        if self.sauce_var.get():
+            print(f"Sauce selected: {self.sauce_var.get()}")
+            self.destroy()
+        else:
+            messagebox.showwarning("Incomplete Selection", "Please select a sauce option.")
+
+    def close_window(self):
+        self.destroy()
+
+class SideMenu(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Select Side:")
+        self.geometry("400x300")
+
+        self.parent = parent  # Keep a reference to the parent window
+
+        self.side_options = ["Plain potato chips", "BBQ potato chips", "Salt and vinegar potato chips", "Spicy potato chips","None"]
+        self.side_var = tk.StringVar()
+        self.side_var.set("")
+
+        self.side_dropdown = ttk.Combobox(self, textvariable=self.side_var, values=self.side_options)
+        self.side_dropdown.pack(pady=20)
+
+        self.select_button = tk.Button(self, text="Select", command=self.select_side)
+        self.select_button.pack(pady=20)
+
+        # Back button
+        self.back_button = tk.Button(self, text="Back", command=self.close_window)
+        self.back_button.pack(pady=20)
+
+    def select_side(self):
+        if self.side_var.get():
+            print(f"Side selected: {self.side_var.get()}")
+            self.destroy()
+        else:
+            messagebox.showwarning("Incomplete Selection", "Please select a side option.")
+
+    def close_window(self):
+        self.destroy()
+
+class DrinkMenu(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Select Drink:")
+        self.geometry("400x300")
+
+        self.parent = parent  # Keep a reference to the parent window
+
+        self.drink_options = ["Cola", "Diet cola", "Water", "Lime sparkling water","None"]
+        self.drink_var = tk.StringVar()
+        self.drink_var.set("")
+
+        self.drink_dropdown = ttk.Combobox(self, textvariable=self.drink_var, values=self.drink_options)
+        self.drink_dropdown.pack(pady=20)
+
+        self.select_button = tk.Button(self, text="Select", command=self.select_drink)
+        self.select_button.pack(pady=20)
+
+        # Back button
+        self.back_button = tk.Button(self, text="Back", command=self.close_window)
+        self.back_button.pack(pady=20)
+
+    def select_drink(self):
+        if self.drink_var.get():
+            print(f"Drink selected: {self.drink_var.get()}")
+            self.destroy()
+        else:
+            messagebox.showwarning("Incomplete Selection", "Please select a drink option.")
+
+    def close_window(self):
+        self.destroy()
+
+if __name__ == "__main__":
+    app = SandwichBuilderApp()
+    app.mainloop()
